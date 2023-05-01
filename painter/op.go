@@ -46,3 +46,30 @@ func WhiteFill(t screen.Texture) {
 func GreenFill(t screen.Texture) {
 	t.Fill(t.Bounds(), color.RGBA{G: 0xff, A: 0xff}, screen.Src)
 }
+  
+  // BgRect малює прямокутник по координатам лівого верхнього та правого нижнього кута.
+  func BgRect(x1, y1, x2, y2 int) OperationFunc {
+	return func(t screen.Texture) {
+	  t.Fill(image.Rect(x1, y1, x2, y2), color.Black, screen.Src)
+	}
+  }
+  
+  // Структура, яка представляє фігуру варіанту
+  type Figure struct {
+	X int
+	Y int
+  }
+  
+  // DrawFigure повертає Operation, яка малює фігуру варіанту по координатам центру
+  func (f *Figure) DrawFigure() OperationFunc {
+	return func(t screen.Texture) {
+		t.Fill(image.Rect(op.X-100, op.Y+50, op.X+100, op.Y-50), op.C, draw.Src)
+		t.Fill(image.Rect(op.X-50, op.Y-100, op.X+50, op.Y+100), op.C, draw.Src)
+	}
+  }
+  
+  // MoveFigure змінює координати центру фігури
+  func (f *Figure) MoveFigure(x, y int) {
+	  f.X += x
+	  f.Y += y
+  }
