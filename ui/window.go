@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"fmt"
 	"image"
 	"image/color"
 	"log"
@@ -35,6 +36,7 @@ func (pw *Visualizer) Main() {
 	pw.done = make(chan struct{})
 	pw.pos.Max.X = 200
 	pw.pos.Max.Y = 200
+	pw.mouseCoords = image.Point{X: 400, Y: 400}
 	driver.Main(pw.run)
 }
 
@@ -43,15 +45,15 @@ func (pw *Visualizer) Update(t screen.Texture) {
 }
 
 func (pw *Visualizer) run(s screen.Screen) {
+	if pw.OnScreenReady != nil {
+		pw.OnScreenReady(s)
+	}
+
 	w, err := s.NewWindow(&screen.NewWindowOptions{
 		Title:  pw.Title,
 		Width:  800,
 		Height: 800,
 	})
-	if pw.OnScreenReady != nil {
-		pw.OnScreenReady(s)
-	}
-
 	if err != nil {
 		log.Fatal("Failed to initialize the app window:", err)
 	}
@@ -118,7 +120,15 @@ func (pw *Visualizer) handleEvent(e any, t screen.Texture) {
 
 	case mouse.Event:
 		if t == nil {
-			// TODO: Реалізувати реакцію на натискання кнопки миші.
+			if e.Button == mouse.ButtonLeft && e.Direction == mouse.DirPress {
+				pw.mouseCoords = image.Point{
+					X: int(e.X),
+					Y: int(e.Y),
+				}
+
+				pw.w.Send(paint.Event{})
+				fmt.Println("X, Y: ", e.X, e.Y)
+			}
 		}
 
 	case paint.Event:
@@ -134,12 +144,12 @@ func (pw *Visualizer) handleEvent(e any, t screen.Texture) {
 }
 
 func (pw *Visualizer) drawDefaultUI() {
-	pw.w.Fill(pw.sz.Bounds(), color.RGBA{R: 219, G: 208, B: 48, A: 1}, draw.Src) // Фон.
+	pw.w.Fill(pw.sz.Bounds(), color.White, draw.Src) // Фон.
 	x, y := pw.mouseCoords.X, pw.mouseCoords.Y
-	// c := color.RGBA{R: 219, G: 208, B: 48, A: 1}
+	c := color.RGBA{R: 219, G: 208, B: 48, A: 1}
 
-	pw.w.Fill(image.Rect(x-200, y+100, x+200, y-100), color.White, draw.Src)
-	pw.w.Fill(image.Rect(x-100, y-200, x+100, y+200), color.White, draw.Src)
+	pw.w.Fill(image.Rect(x-200, y+100, x+200, y-100), c, draw.Src)
+	pw.w.Fill(image.Rect(x-100, y-200, x+100, y+200), c, draw.Src)
 
 	//pw.w.Fill(image.Rect(200, 500, 600, 300), color.RGBA{R: 219, G: 208, B: 48, A: 1}, draw.Src)
 	//pw.w.Fill(image.Rect(300, 200, 500, 600), color.RGBA{R: 219, G: 208, B: 48, A: 1}, draw.Src)
