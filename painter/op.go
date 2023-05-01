@@ -1,6 +1,7 @@
 package painter
 
 import (
+	"image"
 	"image/color"
 
 	"golang.org/x/exp/shiny/screen"
@@ -63,8 +64,8 @@ func GreenFill(t screen.Texture) {
   // DrawFigure повертає Operation, яка малює фігуру варіанту по координатам центру
   func (f *Figure) DrawFigure() OperationFunc {
 	return func(t screen.Texture) {
-		t.Fill(image.Rect(op.X-100, op.Y+50, op.X+100, op.Y-50), op.C, draw.Src)
-		t.Fill(image.Rect(op.X-50, op.Y-100, op.X+50, op.Y+100), op.C, draw.Src)
+		t.Fill(image.Rect(f.X-100, f.Y+50, f.X+100, f.Y-50), color.RGBA{R: 219, G: 208, B: 48, A: 1}, screen.Src)
+		t.Fill(image.Rect(f.X-50, f.Y-100, f.X+50, f.Y+100), color.RGBA{R: 219, G: 208, B: 48, A: 1}, screen.Src)
 	}
   }
   
