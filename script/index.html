@@ -7,9 +7,12 @@
     <title>Web client for Go painter</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Open+Sans&display=swap');
         html, body {
             height: 100%;
+        }
+
+        body {
+            background: url(https://yummyanime.tv/bag.webp) center top fixed;
         }
 
         .wrapper {
@@ -22,7 +25,8 @@
         .form-container {
             width: 500px;
             padding: 20px;
-            background-color: #fff;
+            background-color: #141414;
+            color: white;
             font-family: 'Open Sans', sans-serif;
             border-radius: 10px;
             box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.2);
@@ -39,10 +43,35 @@
 
         .form-group textarea {
             height: 200px;
+            background-color: white
+        }
+
+        .form-group textarea:hover 
+        .form-group textarea:active {
+            background-color: #1f1f1f;
         }
 
         .form-group .btn {
             margin-top: 20px;
+        }
+
+        .form-actions {
+            text-align: right;
+        }
+
+        .actions {
+            margin-top: 10px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .actions button{
+            margin-bottom: 10px;
+        }
+
+        .actions p{
+            font-size: 24px;
+            margin: 8px 8px 8px 0px;
         }
 
         h2 {
@@ -59,32 +88,56 @@
             background: #fff;
             padding: 0 10px;
         }
+
+        button {
+            display: inline-block;
+            cursor: pointer;
+            text-align: center;
+            padding: 0 30px;
+            height: 40px;
+            line-height: 40px;
+            background-color: #c740d3;
+            color: #fff;
+            font-size: 1.1rem;
+            font-weight: 500;
+            white-space: nowrap;
+            border: none;
+            border-radius: 2px;
+            box-shadow: 0 10px 30px rgb(191 61 203 / 34%);
+            text-transform: uppercase;
+            transition: all .3s;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        button:hover,
+        button:active {
+            background-color: #822b8a;
+            box-shadow: none;
+        }
     </style>
 </head>
 <body>
     <div class="wrapper">
         <div class="form-container">
-            <h1>Web client for Golang painter</h1>
+            <h1>Web interface</h1>
             <form>
                 <div class="form-group">
                     <label for="textarea">Enter commands here:</label>
                     <textarea class="form-control" id="textarea" rows="3"></textarea>
                 </div>
-                <button type="submit" class="btn btn-outline-primary btn-block">Send HTTP request</button>
+                <div class="form-actions">
+                    <button type="submit" class="btn-submit">Submit</button>
+                </div>               
             </form>
 
-            <h2><span>OR</span></h2>
-
-            <div class="d-flex justify-content-around">
-                <button type="button" class="btn btn-outline-success gf-script">Green frame script</button>
-                <button type="button" class="btn btn-outline-success dm-script">Diagon move script</button>
+            <div class="actions">
+                <p>Scripts:</p>
+                <button type="button" class="btn-script1">Green frame script</button>
+                <button type="button" class="btn-script2">Diagon move script</button>
             </div>              
         </div>
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
     <script src="src/script.js"></script>
 </body>
 </html>
