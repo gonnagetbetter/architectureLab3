@@ -26,8 +26,8 @@ type Visualizer struct {
 	tx   chan screen.Texture
 	done chan struct{}
 
-	sz          size.Event
-	pos         image.Rectangle
+	sz  size.Event
+	pos image.Rectangle
 	mouseCoords image.Point
 }
 
@@ -36,7 +36,7 @@ func (pw *Visualizer) Main() {
 	pw.done = make(chan struct{})
 	pw.pos.Max.X = 200
 	pw.pos.Max.Y = 200
-	pw.mouseCoords = image.Point{X: 400, Y: 400}
+	pw.mouseCoords = image.Point{400, 400}
 	driver.Main(pw.run)
 }
 
@@ -50,8 +50,8 @@ func (pw *Visualizer) run(s screen.Screen) {
 	}
 
 	w, err := s.NewWindow(&screen.NewWindowOptions{
-		Title:  pw.Title,
-		Width:  800,
+		Title: pw.Title,
+		Width: 800,
 		Height: 800,
 	})
 	if err != nil {
@@ -121,13 +121,14 @@ func (pw *Visualizer) handleEvent(e any, t screen.Texture) {
 	case mouse.Event:
 		if t == nil {
 			if e.Button == mouse.ButtonLeft && e.Direction == mouse.DirPress {
-				pw.mouseCoords = image.Point{
-					X: int(e.X),
-					Y: int(e.Y),
+				// TODO: Реалізувати реакцію на натискання кнопки миші.
+				pw.mouseCoords = image.Point {
+					int(e.X),
+					int(e.Y),
 				}
 
-				pw.w.Send(paint.Event{})
-				fmt.Println("X, Y: ", e.X, e.Y)
+            	pw.w.Send(paint.Event{})
+				fmt.Println("Pressed, coors: ", e.X, e.Y)
 			}
 		}
 
@@ -159,3 +160,4 @@ func (pw *Visualizer) drawDefaultUI() {
 		pw.w.Fill(br, color.White, draw.Src)
 	}
 }
+

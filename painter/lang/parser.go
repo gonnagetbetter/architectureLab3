@@ -42,17 +42,17 @@ func (p *Parser) Parse(in io.Reader) ([]painter.Operation, error) {
 				p.BgColor = painter.OperationFunc(painter.GreenFill)
 
 			case "update":
+				if p.BgColor != nil {
+					res = append(res, p.BgColor)
+				}
+				
 				if p.Rect != nil {
 					res = append(res, p.Rect)
 				}
 
-				if p.BgColor != nil {
-					res = append(res, p.BgColor)
-				}
-
 				for ind, figureInstance := range p.Figures {
 					res = append(res, figureInstance.DrawFigure())
-					fmt.Printf("Figure %d: X: %d, Y: %d\n", ind, figureInstance.X, figureInstance.Y)
+					fmt.Printf("FigureInstance %d: X: %d, Y: %d\n", ind, figureInstance.X, figureInstance.Y)
 				}
 
 				res = append(res, painter.UpdateOp)
