@@ -2,27 +2,25 @@ package lang
 
 import (
 	"bufio"
-	"errors"
-	"fmt"
-	"image/color"
-	"io"
-	"strconv"
 	"strings"
+	"strconv"
+	"errors"
+	"io"
 
 	"github.com/gonnagetbetter/architecture-lab-3/painter"
-	"golang.org/x/exp/shiny/screen"
 )
 
-// Parser уміє прочитати дані з вхідного io.Reader та повернути список операцій представлені вхідним скриптом.
 type Parser struct {
-	BgColor painter.OperationFunc
-	Rect painter.OperationFunc
-	Figures []*painter.Figure
+	State *CanvasState
+}
+
+func NewParserWithState(state *CanvasState) *Parser {
+    return &Parser{State: state}
 }
 
 func (p *Parser) Parse(in io.Reader) ([]painter.Operation, error) {
 	var res []painter.Operation
-	
+
 	scanner := bufio.NewScanner(in)
 
 	for scanner.Scan() {
@@ -30,33 +28,15 @@ func (p *Parser) Parse(in io.Reader) ([]painter.Operation, error) {
 		if len(commands) == 0 {
 			continue
 		}
-		
+
 		for _, val := range commands {
 			cmd := strings.Fields(val)
-			
+
 			switch cmd[0] {
 			case "white":
-				p.BgColor = painter.OperationFunc(painter.WhiteFill)
-			
+				p.State.SetBgColor(painter.OperationFunc(painter.WhiteFill))
 			case "green":
-				p.BgColor = painter.OperationFunc(painter.GreenFill)
-
-			case "update":
-				if p.BgColor != nil {
-					res = append(res, p.BgColor)
-				}
-				
-				if p.Rect != nil {
-					res = append(res, p.Rect)
-				}
-
-				for ind, figureInstance := range p.Figures {
-					res = append(res, figureInstance.DrawFigure())
-					fmt.Printf("FigureInstance %d: X: %d, Y: %d\n", ind, figureInstance.X, figureInstance.Y)
-				}
-
-				res = append(res, painter.UpdateOp)
-
+				p.State.SetBgColor(painter.OperationFunc(painter.GreenFill))
 			case "bgrect":
 				if len(cmd) != 5 {
 					return nil, errors.New("invalid number of arguments for bgrect")
@@ -76,8 +56,7 @@ func (p *Parser) Parse(in io.Reader) ([]painter.Operation, error) {
 				x2Int := int(x2 * 800)
 				y2Int := int(y2 * 800)
 
-				p.Rect = painter.BgRect(x1Int, y1Int, x2Int, y2Int)
-
+				p.State.Rect = painter.BgRect(x1Int, y1Int, x2Int, y2Int)
 			case "figure":
 				if len(cmd) != 3 {
 					return nil, errors.New("invalid number of arguments for figure")
@@ -93,38 +72,38 @@ func (p *Parser) Parse(in io.Reader) ([]painter.Operation, error) {
 				xInt := int(x * 800)
 				yInt := int(y * 800)
 
-				p.Figures = append(p.Figures, &painter.Figure{
+				p.State.AddFigure(&painter.Figure{
 					X: xInt,
 					Y: yInt,
 				})
-			
 			case "move":
 				if len(cmd) != 3 {
 					return nil, errors.New("invalid number of arguments for move")
 				}
-	
+
 				dx, err1 := strconv.ParseFloat(cmd[1], 64)
 				dy, err2 := strconv.ParseFloat(cmd[2], 64)
 
 				if err1 != nil || err2 != nil {
 					return nil, errors.New("invalid arguments for move")
 				}
-				
+
 				dxInt := int(dx * 800)
 				dyInt := int(dy * 800)
 
-				for _, figureInstance := range p.Figures {
-					figureInstance.MoveFigure(dxInt, dyInt)
-				}
-
+				p.State.MoveFigures(dxInt, dyInt)
+			case "update":
+				res = append(res, p.State.Update()...)
 			case "reset":
-				p.BgColor = painter.OperationFunc(func(t screen.Texture) {
-					t.Fill(t.Bounds(), color.Black, screen.Src)
-				})
-				p.Rect = painter.BgRect(0, 0, 0, 0)
-				p.Figures = nil
+				p.State.Reset()
+			default:
+				return nil, errors.New("invalid command")
 			}
 		}
+	}
+
+	if err := scanner.Err(); err != nil {
+		return nil, err
 	}
 
 	return res, nil
